@@ -3,5 +3,3 @@ if name == "John":
     print("Hello John!")
 else:
     print("Hello " + name)
-
-#test
