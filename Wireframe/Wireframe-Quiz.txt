@@ -1,0 +1,40 @@
+Quiz Game
+=========
+What is your name? 
+
+Player's name: ___ #Getting player name, and goto Question.
+
+
+[Question] #If no questions are left goto Results
+Question: What Colour Are Apples?
+
+A - Green
+B - Purple
+C - Red
+D - Green
+
+Answer: ___ #Getting users answer. If correct goto Correct. If incorrect goto Incorrect.
+
+
+[Correct]
+That is correct!
+
+One point has been added to your score. #Add 1 to score.
+
+Score: x #Display score. Goto next Question.
+
+
+[Incorrect]
+That was incorrect.
+
+You have gained no points.
+
+Score: x #Display score. Goto next question.
+
+
+[Results]
+Quiz complete!
+
+Your final score was: x #Display score.
+
+Thanks for playing. #End game.
