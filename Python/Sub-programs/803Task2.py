@@ -1,7 +1,4 @@
 # Predict and Run - Task 2
-'''Prediction:
-First set of scores are averaged. The average score is then printed. The range of scores is then printed.
-The same thing occurs for the second set of scores.'''
 
 def displayScoreData(scores):
   average = sum(scores)/len(scores)
