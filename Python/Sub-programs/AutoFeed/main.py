@@ -5,7 +5,7 @@ def getTotalWeight():
     for i in range(5):
         foodWeight = int(input(f"Enter the food weight {i+1}: "))
         while foodWeight < 0 or foodWeight > 200:
-            print("Invalid, a single container can only hold up to 200g")
+            print("Invalid, a single container can only hold up to 200g.")
             foodWeight = int(input(f"Enter the food weight {i+1}: "))
         allFoodWeight.append(foodWeight)
         totalWeight = totalWeight + foodWeight
@@ -23,7 +23,7 @@ def getMessage(totalWeight, dogSize):
     elif dogSize == "large" and (totalWeight >= 690 and totalWeight <= 900):
         message = "This weight of food is suitable for your large dog."
     else:
-        message = "This weight of food is not recommended for the size of your dog"
+        message = "This weight of food is not recommended for the size of your dog."
     return(message)
 
 def getAvgWeight(totalWeight):
@@ -33,9 +33,9 @@ def getAvgWeight(totalWeight):
 
 def output(allFoodWeight, totalWeight, avgWeight, message):
     for i in range(5):
-        print(f"The food weight of container {i+1} is {allFoodWeight[i]}")
+        print(f"The food weight of container {i+1} is {allFoodWeight[i]}.")
     print(f"The total food weight is {totalWeight}.")
-    print(f"The average food weight is {avgWeight}")
+    print(f"The average food weight is {avgWeight}.")
     print(message)
 
 
