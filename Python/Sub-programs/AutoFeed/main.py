@@ -39,7 +39,7 @@ def output(allFoodWeight, totalWeight, avgWeight, message):
     print(message)
 
 
-(totalWeight, allFoodWeight) = getTotalWeight()
+totalWeight, allFoodWeight = getTotalWeight()
 dogSize = getDogSize()
 message = getMessage(totalWeight, dogSize)
 avgWeight = getAvgWeight(totalWeight)
