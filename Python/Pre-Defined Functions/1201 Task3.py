@@ -18,7 +18,7 @@ def checkSymbol(password):
     
 password = getPass()
 
-while checkCap(password) != True and checkSymbol(password) != True:
+while checkCap(password) != True or checkSymbol(password) != True:
     password = getPass()
 
 print("Success")
