@@ -1,6 +1,6 @@
 temps = []
 
-with open("Python/File_Handling/temps.txt", "r") as file:
+with open("random.txt", "r") as file:
     contents = file.readlines()
     for lines in contents:
         temps.append(int(lines.strip()))
@@ -13,4 +13,3 @@ for i in temps:
 
 avgTemp = total/len(temps)
 print(avgTemp)
-
