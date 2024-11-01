@@ -1,4 +1,3 @@
-
 def getTotalWeight():
     totalWeight = 0
     allFoodWeight = []
@@ -45,7 +44,6 @@ def output(allFoodWeight, totalWeight, avgWeight, message):
     print(f"The total food weight is {totalWeight}.")
     print(f"The average food weight is {avgWeight}.")
     print(message)
-
 
 totalWeight, allFoodWeight = getTotalWeight()
 dogSize = getDogSize()
