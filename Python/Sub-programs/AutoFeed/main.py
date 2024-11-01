@@ -18,7 +18,6 @@ def getTotalWeight():
 
 def getDogSize():
     dogSize = str(input("Please enter the size of your dog (small, medium or large): "))
-    print(dogSize)
     while dogSize != "small" and dogSize != "medium" and dogSize != "large":
         print("Error. Enter a valid size.")
         dogSize = str(input("Please enter the size of your dog (small, medium or large): "))
