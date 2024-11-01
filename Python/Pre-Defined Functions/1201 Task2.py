@@ -1,7 +1,5 @@
 def capitalise(name):
-    name = ord(name[0])
-    name -= 32
-    name = chr(name)
+    name = chr((ord(name[0])) - 32)
     return name
 
 animal = str(input("Please enter the name of an animal: "))
