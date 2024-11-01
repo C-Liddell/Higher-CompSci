@@ -3,16 +3,25 @@ def getTotalWeight():
     totalWeight = 0
     allFoodWeight = []
     for i in range(5):
-        foodWeight = int(input(f"Enter the food weight {i+1}: "))
-        while foodWeight < 0 or foodWeight > 200:
-            print("Invalid, a single container can only hold up to 200g.")
-            foodWeight = int(input(f"Enter the food weight {i+1}: "))
+        while True:
+            try:
+                foodWeight = int(input(f"Enter the food weight {i+1}: "))
+                while foodWeight < 0 or foodWeight > 200:
+                    print("Error. A single container can only hold up to 200g.")
+                    foodWeight = int(input(f"Enter the food weight {i+1}: "))
+                break
+            except:
+                print("Error. Enter a valid number.")
         allFoodWeight.append(foodWeight)
         totalWeight = totalWeight + foodWeight
     return (totalWeight, allFoodWeight)
 
 def getDogSize():
     dogSize = str(input("Please enter the size of your dog (small, medium or large): "))
+    print(dogSize)
+    while dogSize != "small" and dogSize != "medium" and dogSize != "large":
+        print("Error. Enter a valid size.")
+        dogSize = str(input("Please enter the size of your dog (small, medium or large): "))
     return(dogSize)
 
 def getMessage(totalWeight, dogSize):
