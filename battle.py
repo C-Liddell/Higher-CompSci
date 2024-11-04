@@ -1,14 +1,19 @@
 import random as rd
+from dataclasses import dataclass
 
-class character():
-    def __init__(self, health, strength, damage, speed):
-        self.health = health
-        self.damage = damage
-        self.speed = speed
-        self.strength = strength
+@dataclass
+class character:
+    name: str
+    health: int
+    damage: int
+    speed: int
+    strength: int
 
-player = character(100, 5, 7, 6)
-monster = character(75, 6, 6, 4)
+    def __str__(self):
+        return self.name
+
+player = character("player", 100, 5, 7, 6)
+monster = character("monster", 75, 6, 6, 5)
 
 print("A monster approaches.")
 
@@ -34,9 +39,7 @@ def main():
 def fight(mAction):
     if mAction == 1:
         print("You and the monster both take a swing at each other.")
-        pStrength = getStrength(player)
-        mStrength = getStrength(monster)
-        if pStrength > mStrength:
+        if getStrength(player) > getStrength(monster):
             print("You slide by the monsters attack and strike it.")
             pDamage = rd.randint(1,5) + player.damage
             takeDamage(monster, pDamage)
@@ -46,9 +49,7 @@ def fight(mAction):
             takeDamage(player, mDamage)
     elif mAction == 2:
         print("The monster tries to block your attack.")
-        mBlock = getStrength(monster)
-        pStrength = getStrength(player)
-        if mBlock > pStrength:
+        if getStrength(monster) > getStrength(player):
             print("The monster blocked you.")
         else:
             print("You break through the block")
