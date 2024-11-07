@@ -34,6 +34,7 @@ def fight(mAction):
         if skillCheck(player.speed) > skillCheck(monster.speed):
             print(f"You slide by the {monster} strike it.")
             damage(player, monster, 5)
+
         else:
             print(f"The {monster} strikes you.")
             damage(monster, player, 5)
@@ -42,6 +43,7 @@ def fight(mAction):
         print(f"The {monster} tries to block your attack.")
         if skillCheck(monster.strength) > skillCheck(player.strength):
             print(f"The {monster} blocked you.")
+            
         else:
             print("You break through the block")
             damage(player, monster, 5) 
