@@ -14,6 +14,8 @@ class character:
     def __str__(self):
         return self.name
 
+with open("player.json", r) as file:
+    
 
 player = character("Player", 100, 5, 7, 6)
 monster = character("Goblin", 75, 8, 9, 5)
