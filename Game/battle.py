@@ -1,7 +1,7 @@
 import random as rd
 from dataclasses import dataclass
 import os
-
+import json
 
 @dataclass
 class character:
@@ -14,10 +14,10 @@ class character:
     def __str__(self):
         return self.name
 
-with open("player.json", r) as file:
-    
+with open("Game\player.json", "r") as file:
+    data = json.load(file)
+    player = character(data["name"], data["health"], data["damage"], data["speed"], data["strength"])
 
-player = character("Player", 100, 5, 7, 6)
 monster = character("Goblin", 75, 8, 9, 5)
 
 
