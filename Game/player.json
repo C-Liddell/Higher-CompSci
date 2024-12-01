@@ -1,7 +1,0 @@
-{
-    "name": "Player",
-    "health": 100,
-    "damage": 5,
-    "speed": 7,
-    "strength": 6
-}
