@@ -22,11 +22,6 @@ def importFile():
     return thisDate, country, location, shape, description
 # -------------------------------------------------- DO NOT ALTER -----
 
-thisDate, country, location, shape, description = importFile()
-
-
-specifiedCountry = str(input("Enter a country: "))
-
 def CountSightings(c, sC):
     count = 0
     for country in c:
@@ -36,11 +31,8 @@ def CountSightings(c, sC):
 
 def DisplaySightings(sC, nS):
     print(f"There were {nS} sightings in {sC}")
+
     
-numSightings = CountSightings(country, specifiedCountry)
-DisplaySightings(specifiedCountry, numSightings)
-
-
 def CountYearSightings(d):
     count = -1
     lastYear = d[0][6:10]
@@ -53,13 +45,22 @@ def CountYearSightings(d):
             count = 0
             lastYear = thisYear
 
-CountYearSightings(thisDate)
-
 
 def FindSightingsByLocation(l, tD, s, d):
     specifiedLocation = str(input("Enter a location to search for: "))
     for pos in range(0, len(l)):
         if l[pos] == specifiedLocation:
             print(f"{tD[pos]}, {s[pos]}, {d[pos]}")
+
+
+
+
+thisDate, country, location, shape, description = importFile()
+
+specifiedCountry = str(input("Enter a country: "))
+numSightings = CountSightings(country, specifiedCountry)
+DisplaySightings(specifiedCountry, numSightings)
+
+CountYearSightings(thisDate)
 
 FindSightingsByLocation(location, thisDate, shape, description)
