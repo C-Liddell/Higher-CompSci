@@ -17,3 +17,35 @@
 
 # Output Format
 # One positive whole number
+
+"""
+Ask for and store x
+If x is a single digit then
+     Ask for and store valid special offer 
+     If special offer is yes then
+          Ask for and store the number of additional rows included for free
+Calculate number of tin cans in pack
+Output number of tin cans in pack
+
+Ask for and store special offer
+While special offer is not y and special offer is not n Do
+    Output error message
+    Ask for and store special offer
+End While
+"""
+
+def getValid():
+    enter = str(input("Is a special offer running? (y/n): "))
+    while enter != "y" and enter != "n":
+        print("Error. Please enter a valid input.")
+        enter = str(input("Is a special offer running? (y/n): "))
+    return enter
+
+addRows = 0
+x = int(input("Enter length of pack: "))
+if len(str(x)) == 1:
+    specialOffer = getValid()
+    if specialOffer == "y":
+        addRows = int(input("How many extra rows would you like to add?: "))
+noCans = x*(x+addRows)
+print(f"The number of cans in this pack will be {noCans}.")

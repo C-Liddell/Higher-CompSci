@@ -30,12 +30,25 @@ Ask for and store day of the week
 End While
 """
 
-def vaildDOW():
+def validDOW():
     validInputs = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
-    d = str(input("Enter a day of the week in format (MO/ TU/ WE/ TH/ FR/ SA/ SU): "))
+    d = str(input("Enter a day of the week in format (MO / TU / WE / TH / FR / SA / SU): "))
     while d not in validInputs:
-        print("Error")
-        d = str(input("Enter a day of the week in format (MO/ TU/ WE/ TH/ FR/ SA/ SU): "))
+        print("Error. Please enter a valid input.")
+        d = str(input("Enter a day of the week in format (MO / TU / WE / TH / FR/ SA / SU): "))
     return d
 
+
 DOW = validDOW()
+leapYear = str(input("Is it a leap year? (y/n): "))
+
+if DOW == "SA" and leapYear == "n":
+    noSaturdays = 53
+elif DOW == "SA" or DOW == "FR" and leapYear == "y":
+    noSaturdays = 53
+else:
+    noSaturdays = 52
+
+print(f"The number of Saturdays in the year is {noSaturdays}.")
+
+    
