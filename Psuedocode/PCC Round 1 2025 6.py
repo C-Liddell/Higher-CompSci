@@ -93,5 +93,3 @@ for i in range(noLines):
     sentence.append(word)
 sentence = translate(sentence)
 print(' '.join(sentence))
-
-
