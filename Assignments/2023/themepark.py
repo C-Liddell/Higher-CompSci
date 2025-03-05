@@ -1,5 +1,6 @@
 import csv
 
+
 def read():
     attraction = []
     category = []
@@ -16,20 +17,45 @@ def read():
             height.append(str(rows[4]))
     return attraction, category, visitors, daysOpen, height
 
+
 def visitedAttractions(attraction, visitors):
     maxPos = 0
-    maxValue = 0
-
+    maxValue = visitors[0]
     minPos = 0
-    minValue = 1000000
+    minValue = visitors[0]
+
     for i in range(0, len(visitors)):
         if visitors[i] > maxValue:
             maxPos = i
+            maxValue = visitors[i]
+        if visitors[i] < minValue:
+            minPos = i
+            minValue = visitors[i]
+
+    print(f"The most visited attraction is {attraction[maxPos]}. The least visited attraction is {attraction[minPos]}.")
 
 
 def write(attraction, category, daysOpen):
-    pass
+    with open("Assignments/2023/service.csv", "w") as file:
+        for i in range(0, len(attraction)):
+            if category[i] == "Roller Coaster":
+                days = daysOpen[i]%90
+                if (90-days) <= 7:
+                    file.write(f"{attraction[i]},")
+
+
+def heightRestriction(attraction, height):
+    count = 0
+    list = []
+    for i in range(0, len(height)):
+        if str(height[i])[0] == "1":
+            count += 1
+            list.append(attraction[i])
+    print(' '.join(attraction))
+
+
 
 attraction, category, visitors, daysOpen, height = read()
 visitedAttractions(attraction, visitors)
 write(attraction, category, daysOpen)
+heightRestriction()
