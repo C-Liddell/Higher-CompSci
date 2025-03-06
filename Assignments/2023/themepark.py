@@ -51,11 +51,10 @@ def heightRestriction(attraction, height):
         if str(height[i])[0] == "1":
             count += 1
             list.append(attraction[i])
-    print(' '.join(attraction))
-
+    print(f"There are {count} attractions with a height restriction of over 1m. They are: {', '.join(list)}.")
 
 
 attraction, category, visitors, daysOpen, height = read()
 visitedAttractions(attraction, visitors)
 write(attraction, category, daysOpen)
-heightRestriction()
+heightRestriction(attraction, height)
