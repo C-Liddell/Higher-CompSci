@@ -9,7 +9,7 @@ class TEMP():
 
 def getValidTemps():
     temps = []
-    for i in range(3):
+    for i in range(14):
         day = str(input(f"Enter day of the week {i+1}: "))
         temp = float(input(f"Enter temperature {i+1}: "))
         while temp > 50 or temp < -20:
