@@ -46,7 +46,17 @@ class Chalked(toga.App):
         We then create a main window (with a name matching the app), and
         show the main window.
         """
-        main_box = toga.Box()
+        main_box = toga.Box(direction = COLUMN)
+
+        table = toga.DetailedList(
+            data = [{
+                "icon": None,
+                "title": testEntry.getDate(),
+                "subtitle": f"{testEntry.getType()}, {testEntry.getGrade()}, {testEntry.getAttempts()}"
+            }]
+        )
+
+        main_box.add(table)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = main_box
