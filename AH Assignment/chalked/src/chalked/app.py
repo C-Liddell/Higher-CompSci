@@ -5,6 +5,38 @@ Log Climbs
 import toga
 from toga.style.pack import COLUMN, ROW
 
+class Entry():
+    def __init__(self):
+        self.__date = ""
+        self.__type = ""
+        self.__grade = ""
+        self.__attempts = 0
+
+    def getDate(self):
+        return self.__date
+    def setDate(self, newDate):
+        self.__date = newDate
+
+    def getType(self):
+        return self.__type
+    def setType(self, newType):
+        self.__type = newType
+
+    def getGrade(self):
+        return self.__grade
+    def setGrate(self, newGrade):
+        self.__grade = newGrade
+
+    def getAttempts(self):
+        return self.__attempts
+    def increaseAttempts(self):
+        self.__attempts += 1
+
+testEntry = Entry()
+testEntry.setDate("24/09/25")
+testEntry.setType("Boulder")
+testEntry.setGrade("V6")
+
 
 class Chalked(toga.App):
     def startup(self):
