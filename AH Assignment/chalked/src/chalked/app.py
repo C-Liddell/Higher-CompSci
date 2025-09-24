@@ -24,7 +24,7 @@ class Entry():
 
     def getGrade(self):
         return self.__grade
-    def setGrate(self, newGrade):
+    def setGrade(self, newGrade):
         self.__grade = newGrade
 
     def getAttempts(self):
