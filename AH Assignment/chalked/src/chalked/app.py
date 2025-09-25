@@ -5,12 +5,18 @@ Log Climbs
 import toga
 from toga.style.pack import COLUMN, ROW
 
+import sqlite3
+con = sqlite3.connect("C:/Users/C_Lid/Documents/gitRepos/Higher-CompSci/AH Assignment/chalked/src/chalked/resources/entriesDatabase.db")
+cur = con.cursor()
+
+toga.Widget.DEBUG_LAYOUT_ENABLED = True
+
 class Entry():
-    def __init__(self):
-        self.__date = "01/01/25"
-        self.__type = "Climb"
-        self.__grade = "V0"
-        self.__attempts = 0
+    def __init__(self, date, type, grade, attempts):
+        self.__date = date
+        self.__type = type
+        self.__grade = grade
+        self.__attempts = attempts
 
     def getDate(self):
         return self.__date
@@ -35,9 +41,10 @@ class Entry():
     def getDetails(self):
         return f"{self.__type}, {self.__grade}, {self.__attempts}"
 
-entries = [Entry() for x in range(10)]
+entries = []
 
-
+for row in cur.execute("SELECT * FROM Entries"):
+    entries.append(Entry(row[0], row[1], row[2], row[3]))
 
 class Chalked(toga.App):
     def startup(self):
@@ -50,7 +57,7 @@ class Chalked(toga.App):
         mainBox = toga.Box(direction = COLUMN)
         searchBox = toga.Box(direction = ROW)
         filterBox = toga.Box(direction = ROW)
-        listBox = toga.Box(direction = COLUMN)
+        listBox = toga.Box(direction = COLUMN, flex = 1)
         navBox = toga.Box(direction = ROW)
 
 
@@ -61,7 +68,7 @@ class Chalked(toga.App):
         filter2 = toga.Button("Top Rope Climbs", flex = 1)
         filter3 = toga.Button("Boulders", flex = 1)
 
-        table = toga.DetailedList(
+        table = toga.DetailedList(flex = 1,
             data = [{
                 "icon": None,
                 "title": i.getDate(),
