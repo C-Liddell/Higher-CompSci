@@ -5,9 +5,12 @@ Log Climbs
 import toga
 from toga.style.pack import COLUMN, ROW
 
+from pathlib import Path
+
 import sqlite3
-con = sqlite3.connect("C:/Users/C_Lid/Documents/gitRepos/Higher-CompSci/AH Assignment/chalked/src/chalked/resources/entriesDatabase.db")
+con = sqlite3.connect(Path(__file__).parent / "resources/entriesDatabase.db")
 cur = con.cursor()
+
 
 toga.Widget.DEBUG_LAYOUT_ENABLED = True
 
