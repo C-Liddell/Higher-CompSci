@@ -2,14 +2,13 @@
 Log Climbs
 """
 
-import toga
-from toga.style.pack import COLUMN, ROW
+import toga # pyright: ignore[reportMissingImports] 
+from toga.style.pack import COLUMN, ROW # pyright: ignore[reportMissingImports]
 
 from pathlib import Path
 
 import sqlite3
-con = sqlite3.connect(Path(__file__).parent / "resources/entriesDatabase.db")
-cur = con.cursor()
+
 
 
 toga.Widget.DEBUG_LAYOUT_ENABLED = True
@@ -44,52 +43,72 @@ class Entry():
     def getDetails(self):
         return f"{self.__type}, {self.__grade}, {self.__attempts}"
 
-entries = []
-
-for row in cur.execute("SELECT * FROM Entries"):
-    entries.append(Entry(row[0], row[1], row[2], row[3]))
 
 class Chalked(toga.App):
     def startup(self):
-        """Construct and show the Toga application.
+        self.con = sqlite3.connect(Path(__file__).parent / "resources/entriesDatabase.db")
+        self.cur = self.con.cursor()
 
-        Usually, you would add your application to a main content box.
-        We then create a main window (with a name matching the app), and
-        show the main window.
-        """
+        self.entries = []
+        #for row in self.cur.execute("SELECT * FROM Entries"):
+            #self.entries.append(Entry(row[0], row[1], row[2], row[3]))
+
         mainBox = toga.Box(direction = COLUMN)
         searchBox = toga.Box(direction = ROW)
-        filterBox = toga.Box(direction = ROW)
+        self.filterBox = toga.Box(direction = ROW)
         listBox = toga.Box(direction = COLUMN, flex = 1)
         navBox = toga.Box(direction = ROW)
-
 
         searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
         searchButton = toga.Button("Search", flex = 1)
 
-        filter1 = toga.Button("Lead Climbs", flex = 1)
-        filter2 = toga.Button("Top Rope Climbs", flex = 1)
-        filter3 = toga.Button("Boulders", flex = 1)
+        filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
+        filter2 = toga.Button("Top Rope Climbs", on_press = self.filterTR, flex = 1)
+        filter3 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
+        self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
 
-        table = toga.DetailedList(flex = 1,
-            data = [{
-                "icon": None,
-                "title": i.getDate(),
-                "subtitle": i.getDetails()
-                } for i in entries]
-        )
+        self.table = toga.DetailedList(flex = 1)
+        self.resetFilter(None)
 
         addButton = toga.Button("Add Entry")
 
-        mainBox.add(searchBox, filterBox, listBox, navBox)
+        mainBox.add(searchBox, self.filterBox, listBox, navBox)
         searchBox.add(searchBar, searchButton)
-        filterBox.add(filter1, filter2, filter3)
-        listBox.add(table)
+        self.filterBox.add(filter1, filter2, filter3)
+        listBox.add(self.table)
         navBox.add(addButton)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = mainBox
         self.main_window.show()
+
+
+    def filterList(self, type):
+        newList = []
+        for row in self.cur.execute(f"SELECT * FROM Entries WHERE Type LIKE '{type}%'"):
+            newList.append(Entry(row[0], row[1], row[2], row[3]))
+        self.entries = newList
+        self.table.data = [{
+            "icon": None,
+            "title": i.getDate(),
+            "subtitle": i.getDetails()
+        } for i in self.entries]
+
+        if self.reset not in self.filterBox.children:
+            self.filterBox.add(self.reset)
+        
+    def filterLead(self, widget):
+        self.filterList("Lead")
+
+    def filterTR(self, widget):
+        self.filterList("Top Rope")
+
+    def filterBoulder(self, widget):
+        self.filterList("Boulder")
+
+    def resetFilter(self, widget):
+        self.filterList("%")
+        self.filterBox.remove(self.reset)
 
 
 def main():
