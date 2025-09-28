@@ -21,6 +21,7 @@ test_sources = [
 ]
 
 requires = [
+    "pathlib",
 ]
 test_requires = [
     "pytest",
