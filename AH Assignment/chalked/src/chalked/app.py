@@ -50,37 +50,35 @@ class Chalked(toga.App):
         self.cur = self.con.cursor()
 
         self.entries = []
-        #for row in self.cur.execute("SELECT * FROM Entries"):
-            #self.entries.append(Entry(row[0], row[1], row[2], row[3]))
 
-        mainBox = toga.Box(direction = COLUMN)
-        searchBox = toga.Box(direction = ROW)
+        self.mainBox = toga.Box(direction = COLUMN)
+        self.searchBox = toga.Box(direction = ROW)
         self.filterBox = toga.Box(direction = ROW)
-        listBox = toga.Box(direction = COLUMN, flex = 1)
-        navBox = toga.Box(direction = ROW)
+        self.listBox = toga.Box(direction = COLUMN, flex = 1)
+        self.navBox = toga.Box(direction = ROW)
 
-        searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
-        searchButton = toga.Button("Search", flex = 1)
+        self.searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
+        self.searchButton = toga.Button("Search", flex = 1)
 
-        filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
-        filter2 = toga.Button("Top Rope Climbs", on_press = self.filterTR, flex = 1)
-        filter3 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
+        self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
+        self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
 
         self.table = toga.DetailedList(flex = 1)
-        self.resetFilter(None)
 
-        addButton = toga.Button("Add Entry")
+        self.addButton = toga.Button("Add Entry")
 
-        mainBox.add(searchBox, self.filterBox, listBox, navBox)
-        searchBox.add(searchBar, searchButton)
-        self.filterBox.add(filter1, filter2, filter3)
-        listBox.add(self.table)
-        navBox.add(addButton)
+        self.mainBox.add(self.searchBox, self.filterBox, self.listBox, self.navBox)
+        self.searchBox.add(self.searchBar, self.searchButton)
+        self.filterBox.add(self.filter1, self.filter2)
+        self.listBox.add(self.table)
+        self.navBox.add(self.addButton)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
-        self.main_window.content = mainBox
+        self.main_window.content = self.mainBox
         self.main_window.show()
+
+        self.resetFilter(None)
 
 
     def filterList(self, type):
@@ -99,9 +97,6 @@ class Chalked(toga.App):
         
     def filterLead(self, widget):
         self.filterList("Lead")
-
-    def filterTR(self, widget):
-        self.filterList("Top Rope")
 
     def filterBoulder(self, widget):
         self.filterList("Boulder")
