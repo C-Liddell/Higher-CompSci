@@ -2,8 +2,8 @@
 Log Climbs
 """
 
-import toga # pyright: ignore[reportMissingImports] 
-from toga.style.pack import COLUMN, ROW # pyright: ignore[reportMissingImports]
+import toga
+from toga.style.pack import COLUMN, ROW
 
 from pathlib import Path
 
