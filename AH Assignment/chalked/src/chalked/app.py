@@ -10,7 +10,6 @@ from pathlib import Path
 import sqlite3
 
 
-
 toga.Widget.DEBUG_LAYOUT_ENABLED = True
 
 class Entry():
@@ -51,6 +50,33 @@ class Chalked(toga.App):
 
         self.entries = []
 
+        self.activeScreen = mainScreen(self)
+
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.main_window.content = self.activeScreen.getScreen()
+        self.main_window.show()
+    
+    def getCursor(self):
+        return self.cur
+    
+    def getEntries(self):
+        return self.entries
+    
+    def setEntries(self, newList):
+        self.entries = newList
+
+    def switchScreen(self, newScreen):
+        self.activeScreen = newScreen
+        self.main_window.content = self.activeScreen.getScreen()
+
+
+class mainScreen():
+    def __init__(self, app):
+
+        self.app = app
+        self.cur = app.getCursor()
+        self.entries = app.getEntries()
+
         self.mainBox = toga.Box(direction = COLUMN)
         self.searchBox = toga.Box(direction = ROW)
         self.filterBox = toga.Box(direction = ROW)
@@ -58,8 +84,7 @@ class Chalked(toga.App):
         self.navBox = toga.Box(direction = ROW)
 
         self.searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
-        self.searchButton = toga.Button("Search", flex = 1)
-
+        self.searchButton = toga.Button("Search", on_press = self.search_press, flex = 1)
         self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
         self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
@@ -74,10 +99,6 @@ class Chalked(toga.App):
         self.listBox.add(self.table)
         self.navBox.add(self.addButton)
 
-        self.main_window = toga.MainWindow(title=self.formal_name)
-        self.main_window.content = self.mainBox
-        self.main_window.show()
-
         self.resetFilter(None)
 
 
@@ -85,12 +106,12 @@ class Chalked(toga.App):
         newList = []
         for row in self.cur.execute(f"SELECT * FROM Entries WHERE Type LIKE '{type}%'"):
             newList.append(Entry(row[0], row[1], row[2], row[3]))
-        self.entries = newList
         self.table.data = [{
             "icon": None,
             "title": i.getDate(),
             "subtitle": i.getDetails()
-        } for i in self.entries]
+        } for i in newList]
+        self.app.setEntries(newList)
 
         if self.reset not in self.filterBox.children:
             self.filterBox.add(self.reset)
@@ -105,6 +126,20 @@ class Chalked(toga.App):
         self.filterList("%")
         self.filterBox.remove(self.reset)
 
+    def getScreen(self):
+        return self.mainBox
+    
+    def search_press(self, widget):
+        self.app.switchScreen(Test())
 
+
+class Test():
+    def __init__(self):
+        self.box = toga.Box()
+
+    def getScreen(self):
+        return self.box
+
+        
 def main():
     return Chalked()
