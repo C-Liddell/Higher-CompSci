@@ -50,7 +50,7 @@ class Chalked(toga.App):
 
         self.entries = []
 
-        self.activeScreen = mainScreen(self)
+        self.activeScreen = MainScreen(self)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = self.activeScreen.getScreen()
@@ -70,7 +70,7 @@ class Chalked(toga.App):
         self.main_window.content = self.activeScreen.getScreen()
 
 
-class mainScreen():
+class MainScreen():
     def __init__(self, app):
 
         self.app = app
@@ -84,14 +84,14 @@ class mainScreen():
         self.navBox = toga.Box(direction = ROW)
 
         self.searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
-        self.searchButton = toga.Button("Search", on_press = self.search_press, flex = 1)
+        self.searchButton = toga.Button("Search", flex = 1)
         self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
         self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
 
         self.table = toga.DetailedList(flex = 1)
 
-        self.addButton = toga.Button("Add Entry")
+        self.addButton = toga.Button("Add Entry", on_press = self.addEntry)
 
         self.mainBox.add(self.searchBox, self.filterBox, self.listBox, self.navBox)
         self.searchBox.add(self.searchBar, self.searchButton)
@@ -129,16 +129,26 @@ class mainScreen():
     def getScreen(self):
         return self.mainBox
     
-    def search_press(self, widget):
-        self.app.switchScreen(Test())
+    def addEntry(self, widget):
+        self.app.switchScreen(EntryScreen(self.app))
 
 
-class Test():
-    def __init__(self):
+class EntryScreen():
+    def __init__(self, app):
+        self.app = app
+        self.cur = app.getCursor()
+        self.entries = app.getEntries()
+
         self.box = toga.Box()
+
+        self.backButton = toga.Button("Back", on_press = self.viewEntries)
+        self.box.add(self.backButton)
 
     def getScreen(self):
         return self.box
+    
+    def viewEntries(self, widget):
+        self.app.switchScreen(MainScreen(self.app))
 
         
 def main():
