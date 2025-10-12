@@ -4,13 +4,12 @@ Log Climbs
 
 import toga
 from toga.style.pack import COLUMN, ROW
-
 from pathlib import Path
-
 import sqlite3
 
-
 toga.Widget.DEBUG_LAYOUT_ENABLED = True
+
+
 
 class Entry():
     def __init__(self, date, type, grade, attempts):
@@ -41,6 +40,7 @@ class Entry():
 
     def getDetails(self):
         return f"{self.__type}, {self.__grade}, {self.__attempts}"
+
 
 
 class Chalked(toga.App):
