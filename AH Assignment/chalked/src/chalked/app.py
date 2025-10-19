@@ -3,7 +3,7 @@ Log Climbs
 """
 
 import toga
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import COLUMN, ROW, CENTER
 from pathlib import Path
 import sqlite3
 
@@ -12,34 +12,18 @@ toga.Widget.DEBUG_LAYOUT_ENABLED = True
 
 
 class Entry():
-    def __init__(self, date, type, grade, attempts):
+    def __init__(self, date, type, grade, notes, attempts):
         self.__date = date
         self.__type = type
         self.__grade = grade
+        self.__notes = notes
         self.__attempts = attempts
 
     def getDate(self):
-        return self.__date
-    def setDate(self, newDate):
-        self.__date = newDate
-
-    def getType(self):
-        return self.__type
-    def setType(self, newType):
-        self.__type = newType
-
-    def getGrade(self):
-        return self.__grade
-    def setGrade(self, newGrade):
-        self.__grade = newGrade
-
-    def getAttempts(self):
-        return self.__attempts
-    def increaseAttempts(self):
-        self.__attempts += 1
+        return f"{self.__date[8:]}/{self.__date[5:7]}/{self.__date[0:4]}"
 
     def getDetails(self):
-        return f"{self.__type}, {self.__grade}, {self.__attempts}"
+        return f"{self.__type}: {self.__grade}, {self.__notes}"
 
 
 
@@ -63,6 +47,7 @@ class Chalked(toga.App):
         self.main_window.content = self.activeScreen.getScreen()
         self.main_window.show()
     
+
     def getCursor(self):
         return self.cur
     
@@ -118,7 +103,7 @@ class MainScreen():
     def filterList(self, type):
         newList = []
         for row in self.cur.execute(f"SELECT * FROM Entries WHERE Type LIKE '{type}%'"):
-            newList.append(Entry(row[0], row[1], row[2], row[3]))
+            newList.append(Entry(row[0], row[1], row[2], row[3], row[4]))
         self.table.data = [{
             "icon": None,
             "title": i.getDate(),
@@ -131,9 +116,11 @@ class MainScreen():
         
     def filterLead(self, widget):
         self.filterList("Lead")
+        print("LEad")
 
     def filterBoulder(self, widget):
         self.filterList("Boulder")
+        print("Boulder")
 
     def resetFilter(self, widget):
         self.filterList("%")
@@ -148,27 +135,36 @@ class AddScreen():
     def __init__(self, app):
         self.app = app
         self.cur = app.getCursor()
-        self.entries = app.getEntries()
 
-
+        #Defining Layout Boxes
         self.mainBox = toga.Box(direction = COLUMN)
         self.formBox = toga.Box(direction = COLUMN, flex = 1)
-        self.gradeBox = toga.Box(direction = ROW)
-        self.attemptsBox = toga.Box(direction = ROW)
+        self.gradeBox = toga.Box(direction = ROW, flex = 1, align_items = CENTER)
+        self.attemptsBox = toga.Box(direction = ROW, flex = 1, align_items = CENTER)
+        self.notesBox = toga.Box(direction = ROW, flex = 1, align_items = CENTER)
 
+        #Defining Widgets
         self.dateInput = toga.DateInput()
         self.typeInput = toga.Selection(items = ["Lead Climb", "Boulder"])
-        self.gradeLabel = toga.Label(text = "Grade")
-        self.gradeInput = toga.TextInput()
-        self.attemptsLabel = toga.Label(text = "Attempts")
-        self.attemtpsInput = toga.TextInput()
+        self.gradeLabel = toga.Label(text = "Grade:", flex = 1)
+        self.gradeInput = toga.TextInput(flex = 3)
+        self.attemptsLabel = toga.Label(text = "Attempts:", flex = 1)
+        self.attemtpsInput = toga.NumberInput(flex = 3)
+        self.notesLabel = toga.Label(text = "Notes:", flex = 1)
+        self.notesInput = toga.MultilineTextInput(flex = 3)
+        self.addButton = toga.Button(direction = ROW, text = "Add", flex = 1, on_press = self.addEntry)
 
+        #Adding Widgets to Boxes
         self.gradeBox.add(self.gradeLabel, self.gradeInput)
         self.attemptsBox.add(self.attemptsLabel, self.attemtpsInput)
-        self.formBox.add(self.dateInput, self.typeInput, self.gradeBox, self.attemptsBox)
+        self.notesBox.add(self.notesLabel, self.notesInput)
+        self.formBox.add(self.dateInput, self.typeInput, self.gradeBox, self.attemptsBox, self.notesBox)
+        self.mainBox.add(self.formBox, self.addButton, self.app.navBox)
 
-        self.mainBox.add(self.formBox, self.app.navBox)
 
+    def addEntry(self, widget):
+        self.cur.execute(f"INSERT INTO Entries VALUES ('{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', '{self.notesInput.value}', {self.attemtpsInput.value});")
+        self.app.con.commit()
 
     def getScreen(self):
         return self.mainBox
@@ -179,11 +175,11 @@ class StatsScreen():
     def __init__(self, app):
         self.app = app
 
-        self.box = toga.Box()
-        self.box.add(self.app.navBox)
+        self.mainBox = toga.Box()
+        self.mainBox.add(self.app.navBox)
 
     def getScreen(self):
-        return self.box
+        return self.mainBox
 
         
 def main():
