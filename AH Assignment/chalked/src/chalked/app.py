@@ -116,11 +116,9 @@ class MainScreen():
         
     def filterLead(self, widget):
         self.filterList("Lead")
-        print("LEad")
 
     def filterBoulder(self, widget):
         self.filterList("Boulder")
-        print("Boulder")
 
     def resetFilter(self, widget):
         self.filterList("%")
