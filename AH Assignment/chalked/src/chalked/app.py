@@ -29,7 +29,11 @@ class Entry():
 
 class Chalked(toga.App):
     def startup(self):
-        self.con = sqlite3.connect(Path(__file__).parent / "resources/entriesDatabase.db")
+        path = self.paths.data / "entriesDatabase.db"
+        if path.is_file():
+            print("true")
+        self.con = sqlite3.connect(path)
+
         self.cur = self.con.cursor()
 
         self.entries = []
