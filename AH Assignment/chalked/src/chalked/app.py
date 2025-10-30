@@ -29,12 +29,14 @@ class Entry():
 
 class Chalked(toga.App):
     def startup(self):
-        path = self.paths.data / "entriesDatabase.db"
-        if path.is_file():
-            print("true")
-        self.con = sqlite3.connect(path)
-
-        self.cur = self.con.cursor()
+        self.path = self.paths.data / "entriesDatabase.db"
+        
+        try:
+            database = open(self.path, "x")
+            self.connectToDB()
+            self.cur.execute("CREATE TABLE 'Entries' ('Date' TEXT, 'Type' TEXT, 'Grade' TEXT, 'Notes' TEXT, 'Attempts' INTEGER);")
+        except:
+            self.connectToDB()
 
         self.entries = []
 
@@ -44,14 +46,17 @@ class Chalked(toga.App):
         self.statsButton = toga.Button("Stats", on_press = self.switchScreenStats, flex = 1)
 
         self.navBox.add(self.homeButton, self.addButton, self.statsButton)
-
-        self.activeScreen = MainScreen(self)
+        self.mainBox = toga.Box(direction = COLUMN, flex = 1)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
-        self.main_window.content = self.activeScreen.getScreen()
+        self.switchScreenMain(None)
         self.main_window.show()
     
 
+    def connectToDB(self):
+        self.con = sqlite3.connect(self.path)
+        self.cur = self.con.cursor()
+    
     def getCursor(self):
         return self.cur
     
@@ -63,7 +68,9 @@ class Chalked(toga.App):
 
     def switchScreen(self, newScreen):
         self.activeScreen = newScreen
-        self.main_window.content = self.activeScreen.getScreen()
+        self.mainBox.clear()
+        self.mainBox.add(self.activeScreen.getContent(), self.navBox)
+        self.main_window.content = self.mainBox
 
     def switchScreenMain(self, widget):
         self.switchScreen(MainScreen(self))
@@ -83,7 +90,7 @@ class MainScreen():
         self.cur = app.getCursor()
         self.entries = app.getEntries()
 
-        self.mainBox = toga.Box(direction = COLUMN)
+        self.contentBox = toga.Box(direction = COLUMN, flex = 1)
         self.searchBox = toga.Box(direction = ROW)
         self.filterBox = toga.Box(direction = ROW)
         self.listBox = toga.Box(direction = COLUMN, flex = 1)
@@ -96,7 +103,7 @@ class MainScreen():
 
         self.table = toga.DetailedList(flex = 1)
 
-        self.mainBox.add(self.searchBox, self.filterBox, self.listBox, self.app.navBox)
+        self.contentBox.add(self.searchBox, self.filterBox, self.listBox)
         self.searchBox.add(self.searchBar, self.searchButton)
         self.filterBox.add(self.filter1, self.filter2)
         self.listBox.add(self.table)
@@ -128,8 +135,8 @@ class MainScreen():
         self.filterList("%")
         self.filterBox.remove(self.reset)
 
-    def getScreen(self):
-        return self.mainBox
+    def getContent(self):
+        return self.contentBox
 
 
 
@@ -139,7 +146,7 @@ class AddScreen():
         self.cur = app.getCursor()
 
         #Defining Layout Boxes
-        self.mainBox = toga.Box(direction = COLUMN)
+        self.contentBox = toga.Box(direction = COLUMN, flex = 1)
         self.formBox = toga.Box(direction = COLUMN, flex = 1)
         self.gradeBox = toga.Box(direction = ROW, flex = 1, align_items = CENTER)
         self.attemptsBox = toga.Box(direction = ROW, flex = 1, align_items = CENTER)
@@ -161,15 +168,15 @@ class AddScreen():
         self.attemptsBox.add(self.attemptsLabel, self.attemtpsInput)
         self.notesBox.add(self.notesLabel, self.notesInput)
         self.formBox.add(self.dateInput, self.typeInput, self.gradeBox, self.attemptsBox, self.notesBox)
-        self.mainBox.add(self.formBox, self.addButton, self.app.navBox)
+        self.contentBox.add(self.formBox, self.addButton)
 
 
     def addEntry(self, widget):
         self.cur.execute(f"INSERT INTO Entries VALUES ('{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', '{self.notesInput.value}', {self.attemtpsInput.value});")
         self.app.con.commit()
 
-    def getScreen(self):
-        return self.mainBox
+    def getContent(self):
+        return self.contentBox
 
 
 
@@ -177,11 +184,11 @@ class StatsScreen():
     def __init__(self, app):
         self.app = app
 
-        self.mainBox = toga.Box()
-        self.mainBox.add(self.app.navBox)
+        self.contentBox = toga.Box()
+        self.contentBox.add()
 
-    def getScreen(self):
-        return self.mainBox
+    def getContent(self):
+        return self.contentBox
 
         
         
