@@ -24,6 +24,9 @@ class Entry():
 
     def getDetails(self):
         return f"{self.__type}: {self.__grade}, {self.__notes}"
+    
+    def getNotes(self):
+        return self.__notes
 
 
 
@@ -31,6 +34,7 @@ class Chalked(toga.App):
     def startup(self):
         self.path = self.paths.data / "entriesDatabase.db"
         
+        #Checking for/Creating Database
         try:
             database = open(self.path, "x")
             self.connectToDB()
@@ -38,20 +42,19 @@ class Chalked(toga.App):
         except:
             self.connectToDB()
 
-        self.entries = []
-
+        #Defining Nav Bar
         self.navBox = toga.Box(direction = ROW)
         self.homeButton = toga.Button("Home", on_press = self.switchScreenMain, flex = 1)
         self.addButton = toga.Button("Add Entry", on_press = self.switchScreenAdd, flex = 2)
         self.statsButton = toga.Button("Stats", on_press = self.switchScreenStats, flex = 1)
-
         self.navBox.add(self.homeButton, self.addButton, self.statsButton)
+
         self.mainBox = toga.Box(direction = COLUMN, flex = 1)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.switchScreenMain(None)
         self.main_window.show()
-    
+
 
     def connectToDB(self):
         self.con = sqlite3.connect(self.path)
@@ -59,12 +62,6 @@ class Chalked(toga.App):
     
     def getCursor(self):
         return self.cur
-    
-    def getEntries(self):
-        return self.entries
-    
-    def setEntries(self, newList):
-        self.entries = newList
 
     def switchScreen(self, newScreen):
         self.activeScreen = newScreen
@@ -85,24 +82,25 @@ class Chalked(toga.App):
 
 class MainScreen():
     def __init__(self, app):
-
         self.app = app
         self.cur = app.getCursor()
-        self.entries = app.getEntries()
+        self.entries = []
 
+        #Defining Layout Boxes
         self.contentBox = toga.Box(direction = COLUMN, flex = 1)
         self.searchBox = toga.Box(direction = ROW)
         self.filterBox = toga.Box(direction = ROW)
         self.listBox = toga.Box(direction = COLUMN, flex = 1)
 
+        #Defining Widgets
         self.searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
         self.searchButton = toga.Button("Search", flex = 1)
         self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
         self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
+        self.table = toga.DetailedList(on_primary_action = self.deleteItem,flex = 1)
 
-        self.table = toga.DetailedList(flex = 1)
-
+        #Adding Widgets to Boxes
         self.contentBox.add(self.searchBox, self.filterBox, self.listBox)
         self.searchBox.add(self.searchBar, self.searchButton)
         self.filterBox.add(self.filter1, self.filter2)
@@ -118,9 +116,10 @@ class MainScreen():
         self.table.data = [{
             "icon": None,
             "title": i.getDate(),
-            "subtitle": i.getDetails()
+            "subtitle": i.getDetails(),
+            "data": newList.index(i)
         } for i in newList]
-        self.app.setEntries(newList)
+        self.entries = newList
 
         if self.reset not in self.filterBox.children:
             self.filterBox.add(self.reset)
@@ -134,6 +133,11 @@ class MainScreen():
     def resetFilter(self, widget):
         self.filterList("%")
         self.filterBox.remove(self.reset)
+
+    def deleteItem(self, widget, row):
+        self.cur.execute(f"DELETE FROM Entries WHERE Notes = '{self.entries[row.data].getNotes()}'")
+        self.entries.pop(row.data)
+        self.app.con.commit()
 
     def getContent(self):
         return self.contentBox
@@ -174,6 +178,9 @@ class AddScreen():
     def addEntry(self, widget):
         self.cur.execute(f"INSERT INTO Entries VALUES ('{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', '{self.notesInput.value}', {self.attemtpsInput.value});")
         self.app.con.commit()
+        self.gradeInput.value = None
+        self.attemtpsInput.value = None
+        self.notesInput.value = None
 
     def getContent(self):
         return self.contentBox
