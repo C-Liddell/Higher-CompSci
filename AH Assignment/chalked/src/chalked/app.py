@@ -6,6 +6,7 @@ import toga
 from toga.style.pack import COLUMN, ROW, CENTER
 from pathlib import Path
 import sqlite3
+import asyncio
 
 toga.Widget.DEBUG_LAYOUT_ENABLED = True
 
@@ -113,13 +114,8 @@ class MainScreen():
         newList = []
         for row in self.cur.execute(f"SELECT * FROM Entries WHERE Type LIKE '{type}%'"):
             newList.append(Entry(row[0], row[1], row[2], row[3], row[4]))
-        self.table.data = [{
-            "icon": None,
-            "title": i.getDate(),
-            "subtitle": i.getDetails(),
-            "data": newList.index(i)
-        } for i in newList]
         self.entries = newList
+        self.updateTable()
 
         if self.reset not in self.filterBox.children:
             self.filterBox.add(self.reset)
@@ -134,10 +130,19 @@ class MainScreen():
         self.filterList("%")
         self.filterBox.remove(self.reset)
 
+    def updateTable(self):
+        self.table.data = [{
+            "icon": None,
+            "title": i.getDate(),
+            "subtitle": i.getDetails(),
+            "data": self.entries.index(i)
+        } for i in self.entries]
+
     def deleteItem(self, widget, row):
         self.cur.execute(f"DELETE FROM Entries WHERE Notes = '{self.entries[row.data].getNotes()}'")
         self.entries.pop(row.data)
         self.app.con.commit()
+        self.updateTable()
 
     def getContent(self):
         return self.contentBox
@@ -181,6 +186,11 @@ class AddScreen():
         self.gradeInput.value = None
         self.attemtpsInput.value = None
         self.notesInput.value = None
+        self.displayDialog()
+
+    async def displayDialog(self):
+        addedEntryDialog = toga.InfoDialog("Entry Added", "Entry Added to Database")
+        await self.app.main_window.dialog(addedEntryDialog)
 
     def getContent(self):
         return self.contentBox
