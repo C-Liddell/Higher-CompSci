@@ -136,7 +136,7 @@ class MainScreen():
             "icon": None,
             "title": i.getDate(),
             "subtitle": i.getDetails(),
-            "data": self.entries.getID()
+            "data": i.getID()
         } for i in self.entries]
 
     def deleteItem(self, widget, row):
