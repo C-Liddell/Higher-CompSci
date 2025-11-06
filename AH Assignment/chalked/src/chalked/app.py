@@ -13,12 +13,13 @@ toga.Widget.DEBUG_LAYOUT_ENABLED = True
 
 
 class Entry():
-    def __init__(self, date, type, grade, notes, attempts):
+    def __init__(self, ID, date, type, grade, attempts, notes):
+        self.__ID = ID
         self.__date = date
         self.__type = type
         self.__grade = grade
-        self.__notes = notes
         self.__attempts = attempts
+        self.__notes = notes
 
     def getDate(self):
         return f"{self.__date[8:]}/{self.__date[5:7]}/{self.__date[0:4]}"
@@ -26,8 +27,8 @@ class Entry():
     def getDetails(self):
         return f"{self.__type}: {self.__grade}, {self.__notes}"
     
-    def getNotes(self):
-        return self.__notes
+    def getID(self):
+        return self.__ID
 
 
 
@@ -39,7 +40,7 @@ class Chalked(toga.App):
         try:
             database = open(self.path, "x")
             self.connectToDB()
-            self.cur.execute("CREATE TABLE 'Entries' ('Date' TEXT, 'Type' TEXT, 'Grade' TEXT, 'Notes' TEXT, 'Attempts' INTEGER);")
+            self.cur.execute("CREATE TABLE 'Entries' ('ID' INTEGER, 'Date' TEXT, 'Type' TEXT, 'Grade' TEXT, 'Notes' TEXT, 'Attempts' INTEGER);")
         except:
             self.connectToDB()
 
@@ -112,8 +113,8 @@ class MainScreen():
 
     def filterList(self, type):
         newList = []
-        for row in self.cur.execute(f"SELECT * FROM Entries WHERE Type LIKE '{type}%'"):
-            newList.append(Entry(row[0], row[1], row[2], row[3], row[4]))
+        for row in self.cur.execute(f"SELECT * FROM Entries WHERE Type LIKE '{type}%';"):
+            newList.append(Entry(row[0], row[1], row[2], row[3], row[4], row[5]))
         self.entries = newList
         self.updateTable()
 
@@ -135,11 +136,11 @@ class MainScreen():
             "icon": None,
             "title": i.getDate(),
             "subtitle": i.getDetails(),
-            "data": self.entries.index(i)
+            "data": self.entries.getID()
         } for i in self.entries]
 
     def deleteItem(self, widget, row):
-        self.cur.execute(f"DELETE FROM Entries WHERE Notes = '{self.entries[row.data].getNotes()}'")
+        self.cur.execute(f"DELETE FROM Entries WHERE ID = '{row.data}';")
         self.entries.pop(row.data)
         self.app.con.commit()
         self.updateTable()
@@ -180,15 +181,19 @@ class AddScreen():
         self.contentBox.add(self.formBox, self.addButton)
 
 
-    def addEntry(self, widget):
-        self.cur.execute(f"INSERT INTO Entries VALUES ('{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', '{self.notesInput.value}', {self.attemtpsInput.value});")
+    async def addEntry(self, widget):
+        try:
+            for row in self.cur.execute("SELECT MAX(ID) FROM Entries"):
+                previousID = row[0]
+            nextID = previousID + 1
+        except:
+            nextID = 0
+
+        self.cur.execute(f"INSERT INTO Entries VALUES ('{nextID}', '{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', '{self.notesInput.value}', {self.attemtpsInput.value});")
         self.app.con.commit()
         self.gradeInput.value = None
         self.attemtpsInput.value = None
         self.notesInput.value = None
-        self.displayDialog()
-
-    async def displayDialog(self):
         addedEntryDialog = toga.InfoDialog("Entry Added", "Entry Added to Database")
         await self.app.main_window.dialog(addedEntryDialog)
 
