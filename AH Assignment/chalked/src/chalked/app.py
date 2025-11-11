@@ -100,7 +100,7 @@ class MainScreen():
         self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
         self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
-        self.table = toga.DetailedList(on_primary_action = self.deleteItem,flex = 1)
+        self.table = toga.DetailedList(on_primary_action = self.deleteItem, on_secondary_action = self.viewItem, flex = 1)
 
         #Adding Widgets to Boxes
         self.contentBox.add(self.searchBox, self.filterBox, self.listBox)
@@ -144,6 +144,9 @@ class MainScreen():
         self.entries.pop(row.data)
         self.app.con.commit()
         self.updateTable()
+
+    def viewItem(self, widget, row):
+        self.app.switchScreen(ViewScreen(Chalked, row.data))
 
     def getContent(self):
         return self.contentBox
@@ -199,6 +202,25 @@ class AddScreen():
 
     def getContent(self):
         return self.contentBox
+
+
+
+class ViewScreen():
+    def __init__(self, app, rowID):
+        self.app = app
+        self.rowID = rowID
+
+        #Defining Layout Boxes
+        self.contentBox = toga.Box(direction = COLUMN)
+        self.dateClimbBox = toga.Box(direction = ROW)
+        self.gradeAttemptsBox  = toga.Box(direction = ROW)
+        self.notesBox = toga.Box(direction = COLUMN)
+
+        #Defining Widgets
+
+
+        #Adding Widgets to Boxes
+
 
 
 
