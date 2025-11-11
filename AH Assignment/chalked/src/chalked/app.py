@@ -52,7 +52,7 @@ class Chalked(toga.App):
         try:
             database = open(self.path, "x")
             self.connectToDB()
-            self.cur.execute("CREATE TABLE 'Entries' ('ID' INTEGER, 'Date' TEXT, 'Type' TEXT, 'Grade' TEXT, 'Notes' TEXT, 'Attempts' INTEGER);")
+            self.cur.execute("CREATE TABLE 'Entries' ('ID' INTEGER, 'Date' TEXT, 'Type' TEXT, 'Grade' TEXT, 'Attempts' INTEGER, 'Notes' TEXT);")
         except:
             self.connectToDB()
 
@@ -158,7 +158,7 @@ class MainScreen():
         self.updateTable()
 
     def viewItem(self, widget, row):
-        self.app.switchScreen(ViewScreen(Chalked, row.data))
+        self.app.switchScreen(ViewScreen(self.app, row.data))
 
     def getContent(self):
         return self.contentBox
@@ -204,7 +204,7 @@ class AddScreen():
         except:
             nextID = 0
 
-        self.cur.execute(f"INSERT INTO Entries VALUES ('{nextID}', '{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', '{self.notesInput.value}', {self.attemtpsInput.value});")
+        self.cur.execute(f"INSERT INTO Entries VALUES ('{nextID}', '{self.dateInput.value}', '{self.typeInput.value}', '{self.gradeInput.value}', {self.attemtpsInput.value}, '{self.notesInput.value}');")
         self.app.con.commit()
         self.gradeInput.value = None
         self.attemtpsInput.value = None
@@ -220,26 +220,33 @@ class AddScreen():
 class ViewScreen():
     def __init__(self, app, rowID):
         self.app = app
+        self.cur = app.getCursor()
         self.rowID = rowID
 
-        for col in self.app.cur.execute(f"FROM Entries WHERE ID = {self.rowID}"):
+        for col in self.app.cur.execute(f"SELECT * FROM Entries WHERE ID = {self.rowID}"):
             viewedRow = Entry(col[0], col[1], col[2], col[3], col[4], col[5])
 
         #Defining Layout Boxes
-        self.contentBox = toga.Box(direction = COLUMN)
-        self.dateClimbBox = toga.Box(direction = ROW)
-        self.gradeAttemptsBox  = toga.Box(direction = ROW)
-        self.notesBox = toga.Box(direction = COLUMN)
+        self.contentBox = toga.Box(direction = COLUMN, flex = 1)
+        self.dateClimbBox = toga.Box(direction = ROW, flex = 1)
+        self.gradeAttemptsBox  = toga.Box(direction = ROW, flex = 1)
+        self.notesBox = toga.Box(direction = COLUMN, flex = 1)
 
         #Defining Widgets
-        self.dataLabel = toga.Label(text = viewedRow.getDate())
-        self.typeLabel = toga.Label(text = viewedRow.getType())
-        self.gradeLabel = toga.Label(text = viewedRow.getGrade())
-        self.attemptsLabel = toga.Label(text = viewedRow.getAttempts())
+        self.dateLabel = toga.Label(text = viewedRow.getDate(), flex = 1)
+        self.typeLabel = toga.Label(text = viewedRow.getType(), flex = 1)
+        self.gradeLabel = toga.Label(text = viewedRow.getGrade(), flex = 1)
+        self.attemptsLabel = toga.Label(text = viewedRow.getAttempts(), flex = 1)
         self.notesLabel = toga.Label(text = viewedRow.getNotes())
         
         #Adding Widgets to Boxes
+        self.dateClimbBox.add(self.dateLabel, self.typeLabel)
+        self.gradeAttemptsBox.add(self.gradeLabel, self.attemptsLabel)
+        self.notesBox.add(self.notesLabel)
+        self.contentBox.add(self.dateClimbBox, self.gradeAttemptsBox, self.notesBox)
 
+    def getContent(self):
+        return self.contentBox
 
 
 
