@@ -21,14 +21,26 @@ class Entry():
         self.__attempts = attempts
         self.__notes = notes
 
+    def getID(self):
+        return self.__ID
+    
     def getDate(self):
         return f"{self.__date[8:]}/{self.__date[5:7]}/{self.__date[0:4]}"
+    
+    def getType(self):
+        return self.__type
+    
+    def getGrade(self):
+        return self.__grade
+    
+    def getAttempts(self):
+        return self.__attempts
+    
+    def getNotes(self):
+        return self.__notes
 
     def getDetails(self):
         return f"{self.__type}: {self.__grade}, {self.__notes}"
-    
-    def getID(self):
-        return self.__ID
 
 
 
@@ -186,8 +198,8 @@ class AddScreen():
 
     async def addEntry(self, widget):
         try:
-            for row in self.cur.execute("SELECT MAX(ID) FROM Entries"):
-                previousID = row[0]
+            for col in self.cur.execute("SELECT MAX(ID) FROM Entries"):
+                previousID = col[0]
             nextID = previousID + 1
         except:
             nextID = 0
@@ -210,6 +222,9 @@ class ViewScreen():
         self.app = app
         self.rowID = rowID
 
+        for col in self.app.cur.execute(f"FROM Entries WHERE ID = {self.rowID}"):
+            viewedRow = Entry(col[0], col[1], col[2], col[3], col[4], col[5])
+
         #Defining Layout Boxes
         self.contentBox = toga.Box(direction = COLUMN)
         self.dateClimbBox = toga.Box(direction = ROW)
@@ -217,8 +232,12 @@ class ViewScreen():
         self.notesBox = toga.Box(direction = COLUMN)
 
         #Defining Widgets
-
-
+        self.dataLabel = toga.Label(text = viewedRow.getDate())
+        self.typeLabel = toga.Label(text = viewedRow.getType())
+        self.gradeLabel = toga.Label(text = viewedRow.getGrade())
+        self.attemptsLabel = toga.Label(text = viewedRow.getAttempts())
+        self.notesLabel = toga.Label(text = viewedRow.getNotes())
+        
         #Adding Widgets to Boxes
 
 
