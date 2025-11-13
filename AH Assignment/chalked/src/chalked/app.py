@@ -111,7 +111,7 @@ class MainScreen():
         self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
         self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
-        self.table = toga.DetailedList(on_primary_action = self.deleteItem, on_secondary_action = self.viewItem, flex = 1)
+        self.table = toga.DetailedList(primary_action = "View/Edit", on_primary_action = self.viewItem, secondary_action = "Delete", on_secondary_action = self.deleteItem, flex = 1)
 
         #Adding Widgets to Boxes
         self.contentBox.add(self.searchBox, self.filterBox, self.listBox)
