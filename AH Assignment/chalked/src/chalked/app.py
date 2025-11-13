@@ -24,8 +24,11 @@ class Entry():
     def getID(self):
         return self.__ID
     
-    def getDate(self):
+    def getNiceDate(self):
         return f"{self.__date[8:]}/{self.__date[5:7]}/{self.__date[0:4]}"
+    
+    def getPureDate(self):
+        return self.__date
     
     def getType(self):
         return self.__type
@@ -59,9 +62,8 @@ class Chalked(toga.App):
         #Defining Nav Bar
         self.navBox = toga.Box(direction = ROW)
         self.homeButton = toga.Button("Home", on_press = self.switchScreenMain, flex = 1)
-        self.addButton = toga.Button("Add Entry", on_press = self.switchScreenAdd, flex = 2)
-        self.statsButton = toga.Button("Stats", on_press = self.switchScreenStats, flex = 1)
-        self.navBox.add(self.homeButton, self.addButton, self.statsButton)
+        self.addButton = toga.Button("Add Entry", on_press = self.switchScreenAdd, flex = 1)
+        self.navBox.add(self.homeButton, self.addButton)
 
         self.mainBox = toga.Box(direction = COLUMN, flex = 1)
 
@@ -89,10 +91,7 @@ class Chalked(toga.App):
     def switchScreenAdd(self, widget):
         self.switchScreen(AddScreen(self))
 
-    def switchScreenStats(self, widget):
-        self.switchScreen(StatsScreen(self))
 
-    
 
 class MainScreen():
     def __init__(self, app):
@@ -146,7 +145,7 @@ class MainScreen():
     def updateTable(self):
         self.table.data = [{
             "icon": None,
-            "title": i.getDate(),
+            "title": i.getNiceDate(),
             "subtitle": i.getDetails(),
             "data": i.getID()
         } for i in self.entries]
@@ -158,7 +157,7 @@ class MainScreen():
         self.updateTable()
 
     def viewItem(self, widget, row):
-        self.app.switchScreen(ViewScreen(self.app, row.data))
+        self.app.switchScreen(AddScreen(self.app, row.data))
 
     def getContent(self):
         return self.contentBox
@@ -166,9 +165,10 @@ class MainScreen():
 
 
 class AddScreen():
-    def __init__(self, app):
+    def __init__(self, app, rowID = None):
         self.app = app
         self.cur = app.getCursor()
+        self.rowID = rowID
 
         #Defining Layout Boxes
         self.contentBox = toga.Box(direction = COLUMN, flex = 1)
@@ -186,19 +186,31 @@ class AddScreen():
         self.attemtpsInput = toga.NumberInput(flex = 3)
         self.notesLabel = toga.Label(text = "Notes:", flex = 1)
         self.notesInput = toga.MultilineTextInput(flex = 3)
-        self.addButton = toga.Button(direction = ROW, text = "Add", flex = 1, on_press = self.addEntry)
+
+        #Check if editing, or making new entry
+        if rowID == None:
+            self.Button = toga.Button(direction = ROW, text = "Add", flex = 1, on_press = self.addEntry)
+        else:
+            self.Button = toga.Button(direction = ROW, text = "Update", flex = 1, on_press = self.updateEntry)
+            for col in self.app.cur.execute(f"SELECT * FROM Entries WHERE ID = {self.rowID};"):
+                self.selectedRow = Entry(col[0], col[1], col[2], col[3], col[4], col[5])
+            self.dateInput.value = self.selectedRow.getPureDate()
+            self.typeInput.value = self.selectedRow.getType()
+            self.gradeInput.value = self.selectedRow.getGrade()
+            self.attemtpsInput.value = self.selectedRow.getAttempts()
+            self.notesInput.value = self.selectedRow.getNotes()
 
         #Adding Widgets to Boxes
         self.gradeBox.add(self.gradeLabel, self.gradeInput)
         self.attemptsBox.add(self.attemptsLabel, self.attemtpsInput)
         self.notesBox.add(self.notesLabel, self.notesInput)
         self.formBox.add(self.dateInput, self.typeInput, self.gradeBox, self.attemptsBox, self.notesBox)
-        self.contentBox.add(self.formBox, self.addButton)
+        self.contentBox.add(self.formBox, self.Button)
 
 
     async def addEntry(self, widget):
         try:
-            for col in self.cur.execute("SELECT MAX(ID) FROM Entries"):
+            for col in self.cur.execute("SELECT MAX(ID) FROM Entries;"):
                 previousID = col[0]
             nextID = previousID + 1
         except:
@@ -212,55 +224,16 @@ class AddScreen():
         addedEntryDialog = toga.InfoDialog("Entry Added", "Entry Added to Database")
         await self.app.main_window.dialog(addedEntryDialog)
 
-    def getContent(self):
-        return self.contentBox
-
-
-
-class ViewScreen():
-    def __init__(self, app, rowID):
-        self.app = app
-        self.cur = app.getCursor()
-        self.rowID = rowID
-
-        for col in self.app.cur.execute(f"SELECT * FROM Entries WHERE ID = {self.rowID}"):
-            viewedRow = Entry(col[0], col[1], col[2], col[3], col[4], col[5])
-
-        #Defining Layout Boxes
-        self.contentBox = toga.Box(direction = COLUMN, flex = 1)
-        self.dateClimbBox = toga.Box(direction = ROW, flex = 1)
-        self.gradeAttemptsBox  = toga.Box(direction = ROW, flex = 1)
-        self.notesBox = toga.Box(direction = COLUMN, flex = 1)
-
-        #Defining Widgets
-        self.dateLabel = toga.Label(text = viewedRow.getDate(), flex = 1)
-        self.typeLabel = toga.Label(text = viewedRow.getType(), flex = 1)
-        self.gradeLabel = toga.Label(text = viewedRow.getGrade(), flex = 1)
-        self.attemptsLabel = toga.Label(text = viewedRow.getAttempts(), flex = 1)
-        self.notesLabel = toga.Label(text = viewedRow.getNotes())
-        
-        #Adding Widgets to Boxes
-        self.dateClimbBox.add(self.dateLabel, self.typeLabel)
-        self.gradeAttemptsBox.add(self.gradeLabel, self.attemptsLabel)
-        self.notesBox.add(self.notesLabel)
-        self.contentBox.add(self.dateClimbBox, self.gradeAttemptsBox, self.notesBox)
+    async def updateEntry(self, widget):
+        self.cur.execute(f"UPDATE Entries SET date = '{self.dateInput.value}', type = '{self.typeInput.value}', grade = '{self.gradeInput.value}', attempts = {self.attemtpsInput.value}, notes = '{self.notesInput.value}' WHERE ID = {self.rowID}")
+        self.app.con.commit()
+        updatedEntryDialog = toga.InfoDialog("Entry Updated", f"Entry Updated in Database")
+        await self.app.main_window.dialog(updatedEntryDialog)
 
     def getContent(self):
         return self.contentBox
 
 
 
-class StatsScreen():
-    def __init__(self, app):
-        self.app = app
-
-        self.contentBox = toga.Box()
-        self.contentBox.add()
-
-    def getContent(self):
-        return self.contentBox
-
-        
-        
 def main():
     return Chalked() 
