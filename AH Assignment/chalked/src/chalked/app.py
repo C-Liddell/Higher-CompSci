@@ -101,21 +101,17 @@ class MainScreen():
 
         #Defining Layout Boxes
         self.contentBox = toga.Box(direction = COLUMN, flex = 1)
-        self.searchBox = toga.Box(direction = ROW)
         self.filterBox = toga.Box(direction = ROW)
         self.listBox = toga.Box(direction = COLUMN, flex = 1)
 
         #Defining Widgets
-        self.searchBar = toga.TextInput(value = "Enter Search Term...", flex = 7)
-        self.searchButton = toga.Button("Search", flex = 1)
         self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
         self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
         self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
         self.table = toga.DetailedList(primary_action = "View/Edit", on_primary_action = self.viewItem, secondary_action = "Delete", on_secondary_action = self.deleteItem, flex = 1)
 
         #Adding Widgets to Boxes
-        self.contentBox.add(self.searchBox, self.filterBox, self.listBox)
-        self.searchBox.add(self.searchBar, self.searchButton)
+        self.contentBox.add(self.filterBox, self.listBox)
         self.filterBox.add(self.filter1, self.filter2)
         self.listBox.add(self.table)
 
