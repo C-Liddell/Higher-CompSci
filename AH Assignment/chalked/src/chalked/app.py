@@ -24,10 +24,10 @@ class Entry():
     def getID(self):
         return self.__ID
     
-    def getNiceDate(self):
+    def getFormattedDate(self):
         return f"{self.__date[8:]}/{self.__date[5:7]}/{self.__date[0:4]}"
     
-    def getPureDate(self):
+    def getDate(self):
         return self.__date
     
     def getType(self):
@@ -49,9 +49,10 @@ class Entry():
 
 class Chalked(toga.App):
     def startup(self):
+
+
+        #Checking for/creating database
         self.path = self.paths.data / "entriesDatabase.db"
-        
-        #Checking for/Creating Database
         try:
             database = open(self.path, "x")
             self.connectToDB()
@@ -59,35 +60,42 @@ class Chalked(toga.App):
         except:
             self.connectToDB()
 
-        #Defining Nav Bar
+
+        #Defining navbar
         self.navBox = toga.Box(direction = ROW)
         self.homeButton = toga.Button("Home", on_press = self.switchScreenMain, flex = 1)
         self.addButton = toga.Button("Add Entry", on_press = self.switchScreenAdd, flex = 1)
         self.navBox.add(self.homeButton, self.addButton)
 
-        self.mainBox = toga.Box(direction = COLUMN, flex = 1)
 
+        #Initalising mainBox + main_window, and defining inital content
+        self.mainBox = toga.Box(direction = COLUMN, flex = 1)
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.switchScreenMain(None)
         self.main_window.show()
 
 
+    #Sets up DB connection
     def connectToDB(self):
         self.con = sqlite3.connect(self.path)
         self.cur = self.con.cursor()
     
+    #Returns DB cursor object
     def getCursor(self):
         return self.cur
 
+    #Switches mainBox content and updates main_window
     def switchScreen(self, newScreen):
         self.activeScreen = newScreen
         self.mainBox.clear()
         self.mainBox.add(self.activeScreen.getContent(), self.navBox)
         self.main_window.content = self.mainBox
 
+    #Handler for home button
     def switchScreenMain(self, widget):
         self.switchScreen(MainScreen(self))
 
+    #Handler for add button
     def switchScreenAdd(self, widget):
         self.switchScreen(AddScreen(self))
 
@@ -141,7 +149,7 @@ class MainScreen():
     def updateTable(self):
         self.table.data = [{
             "icon": None,
-            "title": i.getNiceDate(),
+            "title": i.getFormattedDate(),
             "subtitle": i.getDetails(),
             "data": i.getID()
         } for i in self.entries]
@@ -190,7 +198,7 @@ class AddScreen():
             self.Button = toga.Button(direction = ROW, text = "Update", flex = 1, on_press = self.updateEntry)
             for col in self.app.cur.execute(f"SELECT * FROM Entries WHERE ID = {self.rowID};"):
                 self.selectedRow = Entry(col[0], col[1], col[2], col[3], col[4], col[5])
-            self.dateInput.value = self.selectedRow.getPureDate()
+            self.dateInput.value = self.selectedRow.getDate()
             self.typeInput.value = self.selectedRow.getType()
             self.gradeInput.value = self.selectedRow.getGrade()
             self.attemtpsInput.value = self.selectedRow.getAttempts()
