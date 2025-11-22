@@ -3,12 +3,13 @@ Log Climbs
 """
 
 import toga
+from toga.style import Pack
 from toga.style.pack import COLUMN, ROW, CENTER
 from pathlib import Path
 import sqlite3
 import asyncio
 
-toga.Widget.DEBUG_LAYOUT_ENABLED = True
+buttonStyle = Pack(background_color = "#6DBCB9", margin_left = 10, margin_right = 10)
 
 
 
@@ -62,9 +63,9 @@ class Chalked(toga.App):
 
 
         #Defining navbar
-        self.navBox = toga.Box(direction = ROW)
-        self.homeButton = toga.Button("Home", on_press = self.switchScreenMain, flex = 1)
-        self.addButton = toga.Button("Add Entry", on_press = self.switchScreenAdd, flex = 1)
+        self.navBox = toga.Box(direction = ROW, background_color = "#474476")
+        self.homeButton = toga.Button("Home", on_press = self.switchScreenMain, flex = 1, style = buttonStyle)
+        self.addButton = toga.Button("Add Entry", on_press = self.switchScreenAdd, flex = 1, style = buttonStyle)
         self.navBox.add(self.homeButton, self.addButton)
 
 
@@ -109,14 +110,14 @@ class MainScreen():
 
         #Defining Layout Boxes
         self.contentBox = toga.Box(direction = COLUMN, flex = 1)
-        self.filterBox = toga.Box(direction = ROW)
+        self.filterBox = toga.Box(direction = ROW, background_color = "#4888B7")
         self.listBox = toga.Box(direction = COLUMN, flex = 1)
 
         #Defining Widgets
-        self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1)
-        self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1)
-        self.reset = toga.Button("Reset", on_press = self.resetFilter, flex = 0.5)
-        self.table = toga.DetailedList(primary_action = "View/Edit", on_primary_action = self.viewItem, secondary_action = "Delete", on_secondary_action = self.deleteItem, flex = 1)
+        self.filter1 = toga.Button("Lead Climbs", on_press = self.filterLead, flex = 1, style = buttonStyle)
+        self.filter2 = toga.Button("Boulders", on_press = self.filterBoulder, flex = 1, style = buttonStyle)
+        self.reset = toga.Button("Reset", on_press = self.resetFilter, style = buttonStyle)
+        self.table = toga.DetailedList(primary_action = "View/Edit", on_primary_action = self.viewItem, secondary_action = "Delete", on_secondary_action = self.deleteItem, flex = 1, background_color = "#8CEFB6")
 
         #Adding Widgets to Boxes
         self.contentBox.add(self.filterBox, self.listBox)
